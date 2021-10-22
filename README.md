@@ -1,4 +1,4 @@
-# Edge Optimized Custom Domain Http Api Gateway w/ Cloudfront Distribution
+# Edge Optimized Custom Domain Http Api Gateway
 
 ## Info 
 
