@@ -38,11 +38,11 @@ For more information...
 - [AWS Documentation: Using a CNAME with Distribution](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html)
 
 
-<!-- ## Architecture
+## Architecture
 
 <p align="center">
   <img src="/architecture-diagram.drawio.svg" />
-</p> -->
+</p>
 
 
 ## Usage 
