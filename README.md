@@ -11,11 +11,11 @@ HTTP APIs are designed for low-latency and cost-effective integrations, some ben
 - built in JWT authorization
 - global rules for CORS headers
 - automatic deployments 
-which make the deployments dead simple. At this point, we can direct endpoints to either trigger 
-AWS Lambda or to another URL endpoint, but there’s no integration with other AWS services as of yet.
+- trigger AWS Lambda or to another URL endpoint
 
 With that said, HTTP APIs are still in beta and have several limitations:
 
+- no integration with other AWS services
 - Fewer configuration options
 - No support for Usage plans and API Keys as with REST APIs.
 - No wildcard subdomains
@@ -25,7 +25,7 @@ With that said, HTTP APIs are still in beta and have several limitations:
 - Simple access logs and receive CloudWatch metrics, no AWS X-Ray support or ability to propagate 
 logs to Kinesis Data Firehose
 
-For Edge Optimized Api Endpoints, the default hostname of an API Gateway API that is deployed 
+For Edge Optimized Api Endpoints, the default hostname of an API Gateway that is deployed 
 to the specified Region while using a CloudFront distribution to facilitate client access 
 typically from across AWS Regions. API requests are routed to the nearest CloudFront 
 Point of Presence (POP), which typically improves connection time for geographically diverse clients.
