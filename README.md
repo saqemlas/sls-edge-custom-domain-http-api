@@ -15,7 +15,7 @@ HTTP APIs are designed for low-latency and cost-effective integrations, some ben
 
 With that said, HTTP APIs are still in beta and have several limitations:
 
-- no integration with other AWS services
+- No integration with other AWS services
 - Fewer configuration options
 - No support for Usage plans and API Keys as with REST APIs.
 - No wildcard subdomains
@@ -34,7 +34,8 @@ For more information...
 - [Serverless Framework: Http Support](https://www.serverless.com/blog/aws-http-api-support)
 - [Serverless Framework: Http Lambda Events](https://www.serverless.com/framework/docs/providers/aws/events/http-api)
 - [AWS Documentation: Http vs Rest](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html)
-- [AWS Documentation: Edge Optimized Apis](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-basic-concept.html#apigateway-definition-edge-optimized-api-endpoint)
+- [AWS Documentation: Edge Optimized Api Endpoint](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-basic-concept.html#apigateway-definition-edge-optimized-api-endpoint)
+- [AWS Documentation: Api Gateway Cloudfront Distribution](https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-cloudfront-distribution/)
 - [AWS Documentation: Using a CNAME with Distribution](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/CNAMEs.html)
 
 
