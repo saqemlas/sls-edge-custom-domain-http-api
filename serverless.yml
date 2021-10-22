@@ -1,0 +1,174 @@
+service: apiCustomDomain
+
+
+variablesResolutionMode: 20210326
+
+
+plugins:
+  - serverless-certificate-creator
+  - serverless-esbuild
+  - serverless-s3-cleaner
+  - serverless-iam-roles-per-function
+  - serverless-cloudfront-invalidate
+
+
+package:
+  individually: true
+  patterns:
+    - '!node_modules/**'
+    - '!.serverless/**'
+
+
+custom:
+  project: awsTemplate
+  baseName: ${self:custom.project}-${self:service}-${self:provider.stage}
+
+  esbuild:
+    target: node14
+    packager: yarn
+    minify: true
+    sourcemap: true
+    concurrency: 10
+  
+  serverless-s3-cleaner:
+    buckets:
+      - ${cf:${self:custom.baseName}.ServerlessDeploymentBucketName, ''}
+
+  serverless-iam-roles-per-function:
+    defaultInherit: true
+  
+  domainName: test.saqemlas.io # ${ssm:/dns/domain/name}
+  hostedZoneId: Z051112517SD3OBYHQA1I # ${ssm:/dns/${custom:domainName}/hostedZoneId}
+
+  customCertificate:
+    certificateName: ${self:custom.domainName}
+    hostedZoneIds: ${self:custom.hostedZoneId}
+    rewriteRecords: true
+    region: us-east-1 # required for edge optimized custom domain http api gateway
+  certificateArn: ${certificate(${self:custom.customCertificate.certificateName}):CertificateArn}
+
+  cloudfrontInvalidate:
+    - distributionIdKey: CloudFrontDistributionId
+      items:
+        - "/*"
+
+
+provider:
+  name: aws
+  region: ${opt:region, 'eu-west-1'}
+  stage: ${opt:stage, 'dev'}
+  stackName: ${self:custom.baseName}
+  deploymentBucket:
+    blockPublicAccess: true
+  runtime: nodejs14.x
+  memorySize: 128
+  timeout: 25 # must be less than 29s for api timeout
+  versionFunctions: false
+  logRetentionInDays: 7
+  logs:
+    httpApi: true
+  environment:
+    AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+  httpApi:
+    disableDefaultEndpoint: false # required when linking edge optis
+    shouldStartNameWithService: true
+    cors:
+      allowedOrigins:
+        - '*'
+      allowedMethods:
+        - GET
+        - POST
+      allowedHeaders:
+        - Content-Type
+  iam:
+    role:
+      name: ${self:custom.baseName}-role
+      statements:
+        - Effect: Allow
+          Action:
+            - logs:CreateLogGroup
+            - logs:CreateLogStream
+            - logs:PutLogEvents
+          Resource: !Sub arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/*:log-stream:*
+
+
+functions:
+  query:
+    name: ${self:custom.baseName}-query
+    handler: src/query/index.handler
+    events:
+      - httpApi:
+          path: /query/{id}
+          method: GET
+  delete:
+    name: ${self:custom.baseName}-delete
+    handler: src/delete/index.handler
+    events:
+      - httpApi:
+          path: /delete/{id}
+          method: POST
+  catch:
+    name: ${self:custom.baseName}-catch
+    handler: src/catch/index.handler
+    events:
+      - httpApi: '*'
+
+
+resources:
+  Resources:
+
+    # Cloudfront
+
+    CloudFrontProxy:
+      Type: AWS::CloudFront::Distribution
+      Properties:
+        DistributionConfig:
+          Comment: ${self:custom.baseName}-distribution
+          Origins:
+            - DomainName: !Sub ${HttpApi}.execute-api.${AWS::Region}.amazonaws.com
+              Id: exampleOrigin
+              CustomOriginConfig:
+                OriginProtocolPolicy: https-only
+          Enabled: true
+          HttpVersion: http2
+          DefaultCacheBehavior:
+            Compress: false
+            ViewerProtocolPolicy: https-only
+            AllowedMethods:
+              - GET
+              - POST
+              - PUT
+              - PATCH
+              - DELETE
+              - HEAD
+              - OPTIONS
+            CachedMethods: 
+              - GET 
+              - HEAD 
+              - OPTIONS
+            CachePolicyId: b2884449-e4de-46a7-ac36-70bc7f1ddd6d # AWS managed policy, CachingOptimizedForUncompressedObjects
+            OriginRequestPolicyId: 59781a5b-3903-41f3-afcb-af62929ccde1 # AWS managed policy, CORS-CustomOrigin
+            TargetOriginId: exampleOrigin
+          Aliases:
+            - ${self:custom.domainName}
+          ViewerCertificate:
+            AcmCertificateArn: ${self:custom.certificateArn}
+            SslSupportMethod: sni-only
+            MinimumProtocolVersion: TLSv1.2_2021
+
+    # Route 53
+
+    DnsRecord:
+      Type: AWS::Route53::RecordSet
+      Properties:
+        Comment: ${self:custom.baseName}-record
+        HostedZoneId: ${self:custom.hostedZoneId}
+        Name: ${self:custom.domainName}
+        Type: A
+        AliasTarget:
+          DNSName: !GetAtt CloudFrontProxy.DomainName
+          HostedZoneId: Z2FDTNDATAQYW2 # AWS managed, fixed value when source is Cloudfront
+
+  Outputs:    
+    CloudFrontDistributionId:
+      Value: !Ref CloudFrontProxy

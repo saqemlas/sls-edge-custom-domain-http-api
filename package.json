@@ -1,0 +1,25 @@
+{
+  "name": "@aws-template/aws-api-custom-domain",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "scripts": {
+    "clean": "rimraf node_modules .serverless .esbuild",
+    "invoke": "f() { serverless invoke local --function $1 --path src/$1/event.json; }; f",
+    "deploy": "f() { yarn run serverless create-cert \"$@\" && yarn run serverless deploy \"$@\"; }; f",
+    "remove": "f() { yarn run serverless remove \"$@\" && yarn run serverless remove-cert \"$@\"; }; f"
+  },
+  "dependencies": {
+    "aws-lambda": "1.0.6"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "8.10.84",
+    "@types/node": "15.3.0",
+    "rimraf": "3.0.2",
+    "serverless": "2.63.0",
+    "serverless-esbuild": "1.20.0",
+    "serverless-s3-cleaner": "1.0.1",
+    "serverless-certificate-creator": "1.6.0",
+    "serverless-cloudfront-invalidate": "1.11.0",
+    "serverless-iam-roles-per-function": "3.2.0"
+  }
+}
