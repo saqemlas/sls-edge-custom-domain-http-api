@@ -1,4 +1,4 @@
-service: apiCustomDomain
+giservice: apiCustomDomain
 
 
 variablesResolutionMode: 20210326
@@ -37,14 +37,14 @@ custom:
   serverless-iam-roles-per-function:
     defaultInherit: true
   
-  domainName: test.saqemlas.io # ${ssm:/dns/domain/name}
-  hostedZoneId: Z051112517SD3OBYHQA1I # ${ssm:/dns/${custom:domainName}/hostedZoneId}
+  domainName: ${ssm:/dns/domain/name}
+  hostedZoneId: ${ssm:/dns/${custom:domainName}/hostedZoneId}
 
   customCertificate:
     certificateName: ${self:custom.domainName}
     hostedZoneIds: ${self:custom.hostedZoneId}
     rewriteRecords: true
-    region: us-east-1 # required for edge optimized custom domain http api gateway
+    region: us-east-1 # required for edge optimized
   certificateArn: ${certificate(${self:custom.customCertificate.certificateName}):CertificateArn}
 
   cloudfrontInvalidate:
@@ -62,7 +62,7 @@ provider:
     blockPublicAccess: true
   runtime: nodejs14.x
   memorySize: 128
-  timeout: 25 # must be less than 29s for api timeout
+  timeout: 25
   versionFunctions: false
   logRetentionInDays: 7
   logs:
@@ -70,7 +70,7 @@ provider:
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
   httpApi:
-    disableDefaultEndpoint: false # required when linking edge optis
+    disableDefaultEndpoint: false # required cloudfront custom origin
     shouldStartNameWithService: true
     cors:
       allowedOrigins:
