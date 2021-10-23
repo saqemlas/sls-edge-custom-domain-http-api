@@ -2,33 +2,16 @@
 
 ## Info 
 
-This handles deployment for an edge optimized custom domain http api gateway with an integrated 
-lambda and distributed with a cloudfront proxy. 
+This handles deployment for a http api gateway with an integrated lambda, a cloudfront distribution, and hosted zone A record. 
 
-HTTP APIs are designed for low-latency and cost-effective integrations, some benefits:
-
-- support catch-all routing (which is not possible with REST APIs)
-- built in JWT authorization
+Http Apis are designed for low-latency and cost-effective integrations, some benefits included in this deploment are:
+- support catch-all routing (which is not possible with Rest Apis)
 - global rules for CORS headers
-- automatic deployments 
-- trigger AWS Lambda or to another URL endpoint
+- trigger AWS Lambda
 
-With that said, HTTP APIs are still in beta and have several limitations:
+For Edge Optimized Apis, the default hostname of an API Gateway that is deployed to the specified Region while using a CloudFront distribution to facilitate client access typically from across AWS Regions. API requests are routed to the nearest CloudFront Point of Presence (POP), which typically improves connection time for geographically diverse clients.
 
-- No integration with other AWS services
-- Fewer configuration options
-- No support for Usage plans and API Keys as with REST APIs.
-- No wildcard subdomains
-- Request and response transformation non existent
-- No caching, validation etc. (have to be implemented in lambda logic)
-- Cannot deploy edge-optimized or private API's. All deployments are regional and public
-- Simple access logs and receive CloudWatch metrics, no AWS X-Ray support or ability to propagate 
-logs to Kinesis Data Firehose
-
-For Edge Optimized Api Endpoints, the default hostname of an API Gateway that is deployed 
-to the specified Region while using a CloudFront distribution to facilitate client access 
-typically from across AWS Regions. API requests are routed to the nearest CloudFront 
-Point of Presence (POP), which typically improves connection time for geographically diverse clients.
+Currently, only Rest Api Gateways support edge optimization, whereby an AWS-Managed cloudfront distribution is deployed to improve client connection time. [See Here](https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-cloudfront-distribution/) As a workaround, this deployment includes a hosted zone a record to create the custom domain targeting the cloudfront distribution which is targeting the api endpoint using a custom origin.
 
 For more information...
 - [Serverless Framework: Http Support](https://www.serverless.com/blog/aws-http-api-support)
@@ -47,6 +30,13 @@ For more information...
 
 
 ## Usage 
+
+### Set Up
+
+1. Add the following ssm parameters to systems manager:
+
+- `/dns/domain/name` *value is domain name registered with aws*
+- `/dns/DOMAIN_NAME/hostedZoneId` *value is hosted zone id for registered domain*
 
 ### Credentials:
 ```bash
