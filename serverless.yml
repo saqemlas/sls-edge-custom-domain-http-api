@@ -69,6 +69,7 @@ provider:
     httpApi: true
   environment:
     AWS_NODEJS_CONNECTION_REUSE_ENABLED: 1
+    NODE_OPTIONS: "--enable-source-maps"
   httpApi:
     disableDefaultEndpoint: false # required cloudfront custom origin
     shouldStartNameWithService: true
@@ -100,13 +101,6 @@ functions:
       - httpApi:
           path: /query/{id}
           method: GET
-  delete:
-    name: ${self:custom.baseName}-delete
-    handler: src/delete/index.handler
-    events:
-      - httpApi:
-          path: /delete/{id}
-          method: POST
   catch:
     name: ${self:custom.baseName}-catch
     handler: src/catch/index.handler
