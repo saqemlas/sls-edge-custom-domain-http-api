@@ -1,4 +1,4 @@
-giservice: apiCustomDomain
+giservice: customdomain
 
 
 variablesResolutionMode: 20210326
@@ -20,7 +20,7 @@ package:
 
 
 custom:
-  project: awsTemplate
+  project: template
   baseName: ${self:custom.project}-${self:service}-${self:provider.stage}
 
   esbuild:
@@ -28,7 +28,6 @@ custom:
     packager: yarn
     minify: true
     sourcemap: true
-    concurrency: 10
   
   serverless-s3-cleaner:
     buckets:

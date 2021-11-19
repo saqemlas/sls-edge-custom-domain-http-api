@@ -8,9 +8,7 @@
     "deploy": "f() { yarn run serverless create-cert \"$@\" && yarn run serverless deploy \"$@\"; }; f",
     "remove": "f() { yarn run serverless remove \"$@\" && yarn run serverless remove-cert \"$@\"; }; f"
   },
-  "dependencies": {
-    "aws-lambda": "1.0.6"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/aws-lambda": "8.10.84",
     "@types/node": "15.3.0",
